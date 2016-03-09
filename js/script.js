@@ -1,6 +1,6 @@
 // This script shows a simple leaflet map and simple d3 chart with some interactions
 
-var map = L.map('map').setView([40.81,-96.68], 4 );
+var map = L.map('map').setView([37.19,-93.28], 4 );
 
 // set a tile layer to be CartoDB tiles 
 var CartoDBTiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',{
@@ -53,37 +53,45 @@ $.getJSON( "data/musicfestivals.geojson", function( data ) {
 
     //style
     var musicCountPointToLayer = function (feature, latlng){
-        var musicCountMarker = L.circleMarker(latlng, 20000, {
-          
+
+        console.log(feature.properties.genre);
+        var value = feature.properties.genre;
+        var fillColor = null;
+        if (value == "Alternative"){
+            fillColor = "#66ffc2";
+        } else if (value == "Bluegrass"){
+            fillColor = "#66d9ff";
+        } else if (value == "Country"){
+            fillColor = "#ffb366";
+        } else if (value == "EDM"){
+            fillColor = "#ff3385";   
+        } else if (value == "Folk"){
+            fillColor = "#b3ff66";
+        } else if (value == "Hip Hop"){
+            fillColor = "#ffbf00";
+        } else if (value == "Indie"){
+            fillColor = "#6666ff";
+        } else if (value == "Jazz"){
+            fillColor = "#cc99ff";
+        } else if (value == "Rock"){
+            fillColor = "#339966";
+        } else if (value == "Top 40"){
+            fillColor = "#ff0000";
+        } else if (value == "Retreat"){
+            fillColor = "#999999";
+        }
+
+//set the radius of the point based off how expensive the festival is
+        var musicCountMarker = L.circleMarker(latlng, {
+            weight: 1,
+            opacity: 0.1 ,
+            color: 'white',
+            fillOpacity: 0.75 ,
+            fillColor: fillColor,
+            radius: radius(feature.properties.full_festival_ticket_price)
         });
 
         return musicCountMarker; 
-    }
-
-    var genreStyle = function (feature){
-        var value = feature.properties.musicfestivals.genre;
-        var fillColor = null;
-        if (value == "Top 40"){
-            fillColor = "#fee5d9";
-
-        } else if (value == "EDM"){
-            fillColor = "#fcbba1";
-
-        } else if (value == "Alternative"){
-            fillColor = "#fc9272";
-        } else if (value == "Indie"){
-            fillColor = "#fb6a4a";
-        }
-
-        var style = {
-            weight: 1 ,
-            poacity: .1 ,
-            color: 'white' ,
-            fillOpacity: 0.75 ,
-            fillColor: fillColor
-        };
-
-        return style;
     }
 
     var musicCountClick = function (feature, layer) {
@@ -91,7 +99,7 @@ $.getJSON( "data/musicfestivals.geojson", function( data ) {
 
         //bind to pop up
         //up case and lower case MATTERS
-        layer.bindPopup("<strong>Festival Name</strong>" + feature.properties.festival_name + "<br /><strong>Genre:</strong>" + feature.properties.genre + "<br /><strong>Location:</strong>" + feature.properties.city + "," + " " + feature.properties.state + "<br /><strong>Approximate Ticket Price:</strong>" + " " + "$" + feature.properties.full_festival_ticket_price);
+        layer.bindPopup("<strong>Festival Name:</strong>" + " " + feature.properties.festival_name + "<br /><strong>Genre:</strong> " + feature.properties.genre + "<br /><strong>Location: </strong>" + feature.properties.city + "," + " " + feature.properties.state + "<br /><strong>Approximate Ticket Price: </strong>" + " " + "$" + feature.properties.full_festival_ticket_price);
     }
 
     musicCountGeoJSON = L.geoJson(musicCount, {
@@ -101,6 +109,17 @@ $.getJSON( "data/musicfestivals.geojson", function( data ) {
 
 
 });
+
+
+function radius(d) {
+    console.log(d);
+    return d > 1000 ? 20 :
+           d > 500  ? 12 :
+           d > 250  ? 8  :
+           d > 125  ? 6  :
+           d > 75   ? 4  :
+                      2 ;
+}
 
 
 function createLayerControls(){

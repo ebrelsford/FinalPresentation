@@ -12,7 +12,7 @@ html, body {
 }
 
 .legend {
-	line-height: 18px;
+	line-height: 13px;
     padding: 6px 8px;
     background: white;
     background: rgba(255,255,255,0.8);
@@ -22,57 +22,57 @@ html, body {
 
 
 .legend i {
-    width: 18px;
-    height: 18px;
+    width: 15px;
+    height: 15px;
     float: left;
     margin-right: 8px;
-    opacity: 0.7;
+    opacity: 3;
 }
 
 svg .legendSvg1 { 
-    fill: #cce6ff;
+    fill: #66ffc2;
     stroke: black; 
     stroke-width: 1;
     opacity: 0.75;
 }
 
 svg .legendSvg2 { 
-    fill: #0000ff;
+    fill: #66d9ff;
     stroke: black; 
     stroke-width: 1;
     opacity: 0.75;
 }
 
 svg .legendSvg3 { 
-    fill: #ffb3b3;
+    fill: #ffb366;
     stroke: black; 
     stroke-width: 1;
     opacity: 0.75;
 }
 
 svg .legendSvg4 { 
-    fill: #ff0066;
+    fill: #ff3385;
     stroke: black; 
     stroke-width: 1;
     opacity: 0.75;
 }
 
 svg .legendSvg5 { 
-    fill: #ffbf00;
+    fill: #b3ff66;
     stroke: black; 
     stroke-width: 1;
     opacity: 0.75;
 }
 
 svg .legendSvg6 { 
-    fill: #751aff;
+    fill: #ffbf00;
     stroke: black; 
     stroke-width: 1;
     opacity: 0.75;
 }
 
 svg .legendSvg7 { 
-    fill: #66ff66;
+    fill: #6666ff;
     stroke: black; 
     stroke-width: 1;
     opacity: 0.75;
