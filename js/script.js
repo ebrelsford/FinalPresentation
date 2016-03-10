@@ -29,7 +29,7 @@ legend.onAdd = function (map) {
             '<svg class="left" width="22" height="18"><circle cx="10" cy="9" r="8" class="legendSvg9"/></svg><span>Rock</span><br />' +
             '<svg class="left" width="22" height="18"><circle cx="10" cy="9" r="8" class="legendSvg10"/></svg><span>Top 40</span><br />' +
             '<svg class="left" width="22" height="18"><circle cx="10" cy="9" r="8" class="legendSvg11"/></svg><span>Other</span><br />' +
-            '<span>*<b>Larger</b> dots represent <b>larger</b> higher ticket prices.</span><br />';
+            '<span>*<b>Larger</b> dots represent <b>higher</b> ticket prices.</span><br />';
             //'<svg class="left" width="22" height="18"><path d = "m 2 2 L 18 2 L 10 16 L 2 2" class="legendSvg"/></svg><span>Triangles denote unknown discharge volume.</span><br /><br />' + 
 ;
     return div;
