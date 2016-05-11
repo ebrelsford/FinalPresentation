@@ -117,6 +117,13 @@ svg .legendSvg11 {
     stroke-width: 1;
     opacity: 0.75;
 }
+
+svg .legendSvg12 { 
+    fill: #ffffff;
+    stroke: gray; 
+    stroke-width: 1;
+    opacity: 0.75;
+}
 .arc text {
   font: 10px sans-serif;
   text-anchor: middle;

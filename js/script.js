@@ -1,4 +1,4 @@
-var map = L.map('map').setView([37.19,-93.28], 4 );
+var map = L.map('map').setView([40.82   ,-96.68], 4);
 
 // set a tile layer to be CartoDB tiles 
 var MapboxTiles = L.tileLayer('https://api.mapbox.com/styles/v1/czirkel/cio0p3is40010aingpsulead4/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY3ppcmtlbCIsImEiOiJjaW45ajM1eGQwMGJvdmdrdmlpcHdqNmFtIn0.mJ3V4g-gZpUP9MarrEjrkQ',{
@@ -8,11 +8,35 @@ var MapboxTiles = L.tileLayer('https://api.mapbox.com/styles/v1/czirkel/cio0p3is
 // add these tiles to our map
 map.addLayer(MapboxTiles);
 // Ask CartoDB for the music festivals camping true layer, as GeoJSON
-  $.getJSON('https://clzirkel.cartodb.com/api/v2/sql?q=SELECT * FROM musicfestivals_1 WHERE camping IN (true)&format=GeoJSON')
+
+var camping = $.getJSON('https://clzirkel.cartodb.com/api/v2/sql?q=SELECT * FROM musicfestivals_1 WHERE camping IN (true)&format=GeoJSON')
   
     // When it's done, add the results to the map
     .done(function (data) {
-      L.geoJson(data).addTo(map);   
+      
+         L.geoJson(data, {
+        //
+        // Create circles instead of standard markers
+        //
+        pointToLayer: function (feature, latlng) {
+          return L.circleMarker(latlng);
+        },
+
+        //
+        // Use an object to style the circle markers.
+        //
+        // If you wanted to, you could make this a function
+        // that takes the feature and returns a style specific
+        // to that feature.
+        //
+        
+        style: {
+          fillColor: '#ffffff',
+          fillOpacity: 0.5,
+          radius: 8,
+          stroke: false
+        }
+      }).addTo(map);   
     });
 //legend
 var legend = L.control({position: 'bottomright'});
@@ -33,7 +57,8 @@ legend.onAdd = function (map) {
             '<svg class="left" width="22" height="18"><circle cx="10" cy="9" r="8" class="legendSvg9"/></svg><span>Rock</span><br />' +
             '<svg class="left" width="22" height="18"><circle cx="10" cy="9" r="8" class="legendSvg10"/></svg><span>Top 40</span><br />' +
             '<svg class="left" width="22" height="18"><circle cx="10" cy="9" r="8" class="legendSvg11"/></svg><span>Other</span><br />' +
-            '<span>*<b>Larger</b> dots represent <p><b>higher</b> ticket prices.</p><p> <a href= "https://www.musicfestivalwizard.com">Data Source</a></p></span><br />';
+            '<span>*<b>Larger</b> dots represent <p><b>higher</b> ticket prices.</p><p> <a href= "https://www.musicfestivalwizard.com">Source 1</a></p><p> <a href= "https://www.fest300.com/">Source 2</a></p></span><br />' +
+            '<svg class="left" width="22" height="18"><circle cx="10" cy="9" r="8" class="legendSvg12"/></svg><span>Camping Available</span><br />';
             //'<svg class="left" width="22" height="18"><path d = "m 2 2 L 18 2 L 10 16 L 2 2" class="legendSvg"/></svg><span>Triangles denote unknown discharge volume.</span><br /><br />' + 
 ;
     return div;
@@ -128,36 +153,23 @@ function radius(d) {
                       5 ;
 }
 // Set option value in constructor
-var startdate = feature.properties.start_date
-var enddate = feature.properties.end_date
-$("#slider").rangeSlider({
-  bounds: {min: 0, max: 100}
-});
-// Change options after slider creation
-$("#slider").rangeSlider("option", "bounds", {min: 10, max: 90});
-// Get option value
-var bounds = $("#slider").rangeSlider("option", "bounds");
 // Set date option
-$("#dateSlider").dateRangeSlider(
+
+$("#slider").dateRangeSlider();
+$("#slider").dateRangeSlider(
   "option",
   "bounds",
   {
-    min: new startdate(2016, 0, 1),
-    max: new enddate(2016, 11, 31)  
+    min: new Date(2016, 0, 1),
+    max: new Date(2016, 11, 31)  
 });
-// Set multiple options at once
-$("#dateSlider").dateRangeSlider(
-  "option",
-  { 
-    bounds: {
-      min: new startdate(2016, 0, 1),
-      max: new enddate(2016, 11, 31)  
-    },
-    enabled: false
-  })
+
 $("#slider").bind("valuesChanged", function(e, data){
-  console.log("Values just changed. min: " + data.startdate.min + " max: " + data.enddate.max);
+    
+    console.log(data)
+  console.log("Values just changed. min: " + data.values.min + " max: " + data.values.max);
 });
+
 
 function createLayerControls(){
     // add in layer controls
@@ -167,9 +179,10 @@ function createLayerControls(){
 
     var overlayMaps = {
         "Music Festivals": musicgeoJSON,
+        "Camping": camping,
     };
 
     // add control
-    L.control.layers(baseMaps, overlayMaps).addTo(map);
+    L.control.layers(baseMaps, overlayMaps, camping).addTo(map);
     
 };
