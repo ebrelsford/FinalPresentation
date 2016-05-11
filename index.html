@@ -8,7 +8,10 @@
     <!-- Including Bootstrap CSS -->
     <link type="text/css" rel="stylesheet" href="libraries/bootstrap-3.3.6-dist/css/bootstrap.min.css"/>
     <!-- Including Leaflet CSS -->
-    <link type="text/css" rel="stylesheet" href="libraries/leaflet-0.7.3/leaflet.css"/>    
+    <link type="text/css" rel="stylesheet" href="libraries/leaflet-0.7.3/leaflet.css"/> 
+
+    <!--range slider april 24-->
+     <link rel="stylesheet" href="css/iThing.css" type="text/css" />   
 
     <!-- Including our custom CSS -->
     <link type="text/css" rel="stylesheet" href="css/stylesheet.css"/>
@@ -68,7 +71,24 @@
   <script type="text/javascript" src="libraries/d3/d3.min.js"></script>
 
   <!-- Including our custom Javascript -->  
-  <script type="text/javascript" src="js/script.js"></script>
+
   <!-- Slider -->
   <script type="text/javascript" src="libraries/leaflet-omnivore/leaflet-omnivore.min.js"></script>
+    <div id="slider"></div>
+    <script src="jquery-ui.js"></script>
+    <script src="js/jQDateRangeSlider-min.js"></script>
+    <script src='js/jQRangeSlider-min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.1/mustache.min.js"></script>
+    <script type="text/javascript" src="js/script.js"></script>
+
+    <script>
+      $("#slider").dateRangeSlider();</script>
+
+  <script id="template" type="x-tmpl-mustache">
+      <p><a href = "http://{{hotlink}}">{{festival_name}} </a></p>
+      <p>{{genre}}</p>
+      <p> Approximate Ticket Cost: {{Full Festival Ticket Price}}</p>
+      <p>{{Start Date}} to {{End Date}}</p>
+      <p>{{City}},{{State}} {{Country}}</p>
+      <p>{{Camping}}</p></script>
 </html>

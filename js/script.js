@@ -1,17 +1,21 @@
-// This script shows a simple leaflet map and simple d3 chart with some interactions
-
 var map = L.map('map').setView([37.19,-93.28], 4 );
 
 // set a tile layer to be CartoDB tiles 
-var CartoDBTiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',{
+var MapboxTiles = L.tileLayer('https://api.mapbox.com/styles/v1/czirkel/cio0p3is40010aingpsulead4/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY3ppcmtlbCIsImEiOiJjaW45ajM1eGQwMGJvdmdrdmlpcHdqNmFtIn0.mJ3V4g-gZpUP9MarrEjrkQ',{
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
 });
 
 // add these tiles to our map
-map.addLayer(CartoDBTiles);
-
+map.addLayer(MapboxTiles);
+// Ask CartoDB for the music festivals camping true layer, as GeoJSON
+  $.getJSON('https://clzirkel.cartodb.com/api/v2/sql?q=SELECT * FROM musicfestivals_1 WHERE camping IN (true)&format=GeoJSON')
+  
+    // When it's done, add the results to the map
+    .done(function (data) {
+      L.geoJson(data).addTo(map);   
+    });
 //legend
-var legend = L.control({position: 'topright'});
+var legend = L.control({position: 'bottomright'});
 
 legend.onAdd = function (map) {
     var div = L.DomUtil.create('div', 'info legend')
@@ -29,7 +33,7 @@ legend.onAdd = function (map) {
             '<svg class="left" width="22" height="18"><circle cx="10" cy="9" r="8" class="legendSvg9"/></svg><span>Rock</span><br />' +
             '<svg class="left" width="22" height="18"><circle cx="10" cy="9" r="8" class="legendSvg10"/></svg><span>Top 40</span><br />' +
             '<svg class="left" width="22" height="18"><circle cx="10" cy="9" r="8" class="legendSvg11"/></svg><span>Other</span><br />' +
-            '<span>*<b>Larger</b> dots represent <b>higher</b> ticket prices.</span><br />';
+            '<span>*<b>Larger</b> dots represent <p><b>higher</b> ticket prices.</p><p> <a href= "https://www.musicfestivalwizard.com">Data Source</a></p></span><br />';
             //'<svg class="left" width="22" height="18"><path d = "m 2 2 L 18 2 L 10 16 L 2 2" class="legendSvg"/></svg><span>Triangles denote unknown discharge volume.</span><br /><br />' + 
 ;
     return div;
@@ -96,10 +100,13 @@ $.getJSON( "data/musicfestivals.geojson", function( data ) {
 
     var musicCountClick = function (feature, layer) {
         var genre = feature.properties.musicfestivals;
+                    var template = $('#template').html(); 
+            var output = Mustache.render(template, feature.properties);
+            layer.bindPopup(output)
 
         //bind to pop up
         //up case and lower case MATTERS
-        layer.bindPopup("<strong>Festival Name:</strong>" + " " + feature.properties.festival_name + "<br /><strong>Genre:</strong> " + feature.properties.genre + "<br /><strong>Location: </strong>" + feature.properties.city + "," + " " + feature.properties.state + "<br /><strong>Approximate Ticket Price: </strong>" + " " + "$" + feature.properties.full_festival_ticket_price);
+        //layer.bindPopup("<strong>Festival Name:</strong>" + " " + feature.properties.festival_name + "<br /><strong>Genre:</strong> " + feature.properties.genre + "<br /><strong>Location: </strong>" + feature.properties.city + "," + " " + feature.properties.state + "<br /><strong>Approximate Ticket Price: </strong>" + " " + "$" + feature.properties.full_festival_ticket_price);
     }
 
     musicCountGeoJSON = L.geoJson(musicCount, {
@@ -113,19 +120,49 @@ $.getJSON( "data/musicfestivals.geojson", function( data ) {
 
 function radius(d) {
     console.log(d);
-    return d > 1000 ? 20 :
-           d > 500  ? 12 :
-           d > 250  ? 8  :
-           d > 125  ? 6  :
-           d > 75   ? 4  :
-                      2 ;
+    return d > 1000 ? 30 :
+           d > 500  ? 25 :
+           d > 250  ? 20  :
+           d > 125  ? 15  :
+           d > 75   ? 10  :
+                      5 ;
 }
-
+// Set option value in constructor
+var startdate = feature.properties.start_date
+var enddate = feature.properties.end_date
+$("#slider").rangeSlider({
+  bounds: {min: 0, max: 100}
+});
+// Change options after slider creation
+$("#slider").rangeSlider("option", "bounds", {min: 10, max: 90});
+// Get option value
+var bounds = $("#slider").rangeSlider("option", "bounds");
+// Set date option
+$("#dateSlider").dateRangeSlider(
+  "option",
+  "bounds",
+  {
+    min: new startdate(2016, 0, 1),
+    max: new enddate(2016, 11, 31)  
+});
+// Set multiple options at once
+$("#dateSlider").dateRangeSlider(
+  "option",
+  { 
+    bounds: {
+      min: new startdate(2016, 0, 1),
+      max: new enddate(2016, 11, 31)  
+    },
+    enabled: false
+  })
+$("#slider").bind("valuesChanged", function(e, data){
+  console.log("Values just changed. min: " + data.startdate.min + " max: " + data.enddate.max);
+});
 
 function createLayerControls(){
     // add in layer controls
     var baseMaps = {
-        "CartoDB Basemap": CartoDBTiles,
+        "Mapbox Basemap": MapboxTiles,
     };
 
     var overlayMaps = {
@@ -136,95 +173,3 @@ function createLayerControls(){
     L.control.layers(baseMaps, overlayMaps).addTo(map);
     
 };
-
-/*// adding in new data with leaflet.omnivore
-omnivore.csv('data/musicfestivals.csv').addTo(map);
-
-// lets add these data with some styling base on two data attributes 
-// and have a popup show up on hovering instead of clicking
-
-// lets set up some global functions for setting styles for the dots
-// we'll use these again in the legend
-
-function fillColor(d) {
-    return d > 500000 ? '#006d2c' :
-           d > 250000 ? '#31a354' :
-           d > 100000 ? '#74c476' :
-           d > 50000  ? '#a1d99b' :
-           d > 10000  ? '#c7e9c0' :
-                        '#edf8e9';
-}
-function radius(d) {
-    return d > 9000 ? 20 :
-           d > 7000 ? 12 :
-           d > 5000 ? 8  :
-           d > 3000 ? 6  :
-           d > 1000 ? 4  :
-                      2 ;
-}
-// first we need to define how we would like the layer styled
-var checkCashingStyle = function (feature, latlng){
-    //console.log(feature.properties.address);
-    var checkCashingMarker = L.circleMarker(latlng, {
-        stroke: false,
-        fillColor: fillColor(feature.properties.amount),
-        fillOpacity: 1,
-        radius: radius(feature.properties.customers)
-    });
-    
-    return checkCashingMarker;
-    
-}
-var checkCashingInteraction = function(feature,layer){    
-    var highlight = {
-        stroke: true,
-        color: '#ffffff', 
-        weight: 3,
-        opacity: 1,
-    };
-    var clickHighlight = {
-        stroke: true,
-        color: '#f0ff00', 
-        weight: 3,
-        opacity: 1,
-    };
-    var noHighlight = {
-        stroke: false,
-    };
-    
-    //add on hover -- same on hover and mousemove for each layer
-    layer.on('mouseover', function(e) {
-        //highlight point
-        layer.setStyle(highlight);
-        // ensure that the dot is moved to the front
-        if (!L.Browser.ie && !L.Browser.opera) {
-            layer.bringToFront();
-        }
-        
-    });
-        
-    layer.on('mouseout', function(e) {
-        // reset style
-        layer.setStyle(noHighlight); 
-                        
-    });
-    
-    // on click 
-    layer.on("click",function(e){
-        // bind popup and open on the map
-        layer.bindPopup('<div class="popupStyle"><h3>' + feature.properties.name + '</h3><p>'+ feature.properties.address + '<br /><strong>Amount:</strong> $' + feature.properties.amount + '<br /><strong>Customers:</strong> ' + feature.properties.customers + '</p></div>').openPopup();
-        // set new style for clicked point
-        layer.setStyle(clickHighlight); 
-    });
-    
-    
-}
-// next, we'll create a shell L.geoJson for omnivore to use to apply styling and interaction
-var checkCashingCustomStuff = L.geoJson(null, {
-    pointToLayer: checkCashingStyle,
-    onEachFeature: checkCashingInteraction
-});
-// lastly, we'll call omnivore to grab the CSV and apply the styling and interaction
-var checkCashingLayer = omnivore.csv('data/musicfestivals.csv', null, checkCashingCustomStuff).addTo(map);
-
-*/
