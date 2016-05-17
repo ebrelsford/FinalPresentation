@@ -73,14 +73,15 @@ var musicgeoJSON;
 
 // use jQuery get geoJSON to grab geoJson layer, parse it, then plot it on the map using the plotDataset function
 
-$.getJSON( "data/musicfestivals.geojson", function( data ) {
-    
+//$.getJSON( "data/musicfestivals.geojson", function( data ) {
+$.getJSON( "https://clzirkel.cartodb.com/api/v2/sql?q=SELECT * FROM musicfestivals_1", function( data ) {
     var musicCount = data;
 // draw the dataset on the map
 
     console.log(musicCount);
 
     //style
+    //
     var musicCountPointToLayer = function (feature, latlng){
 
         console.log(feature.properties.genre);
@@ -155,17 +156,28 @@ function radius(d) {
 // Set option value in constructor
 // Set date option
 
-$("#slider").dateRangeSlider();
-$("#slider").dateRangeSlider(
-  "option",
-  "bounds",
-  {
+//$("#slider").dateRangeSlider();
+$("#slider").dateRangeSlider({
+  //"option",
+  bounds: {
+  
     min: new Date(2016, 0, 1),
-    max: new Date(2016, 11, 31)  
+    max: new Date(2016, 11, 31)},  
 });
 
 $("#slider").bind("valuesChanged", function(e, data){
-    
+    var sql = "SELECT * FROM musicfestivals_1 WHERE start_date > '" + data.values.min.toISOString() + "' AND end_date < '" + data.values.max.toISOString() + "'";
+    var url = 'https://clzirkel.cartodb.com/api/v2/sql?' + $.param({
+        q: sql,
+        format: 'GeoJSON'
+    });
+
+    $.getJSON(url)
+
+    .done(function (data) {
+        dataLayer.clearLayers();
+        dataLayer.addData(data);
+    });
     console.log(data)
   console.log("Values just changed. min: " + data.values.min + " max: " + data.values.max);
 });
