@@ -1,4 +1,27 @@
 var map = L.map('map').setView([40.82   ,-96.68], 4);
+var dataLayer = L.geoJson(null, {
+//
+// Create circles instead of standard markers
+//
+pointToLayer: function (feature, latlng) {
+  return L.circleMarker(latlng);
+},
+
+//
+// Use an object to style the circle markers.
+//
+// If you wanted to, you could make this a function
+// that takes the feature and returns a style specific
+// to that feature.
+//
+
+style: {
+  fillColor: '#ffffff',
+  fillOpacity: 0.5,
+  radius: 8,
+  stroke: false
+}
+}).addTo(map);   
 
 // set a tile layer to be CartoDB tiles 
 var MapboxTiles = L.tileLayer('https://api.mapbox.com/styles/v1/czirkel/cio0p3is40010aingpsulead4/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY3ppcmtlbCIsImEiOiJjaW45ajM1eGQwMGJvdmdrdmlpcHdqNmFtIn0.mJ3V4g-gZpUP9MarrEjrkQ',{
@@ -13,30 +36,7 @@ var camping = $.getJSON('https://clzirkel.cartodb.com/api/v2/sql?q=SELECT * FROM
   
     // When it's done, add the results to the map
     .done(function (data) {
-      
-         L.geoJson(data, {
-        //
-        // Create circles instead of standard markers
-        //
-        pointToLayer: function (feature, latlng) {
-          return L.circleMarker(latlng);
-        },
-
-        //
-        // Use an object to style the circle markers.
-        //
-        // If you wanted to, you could make this a function
-        // that takes the feature and returns a style specific
-        // to that feature.
-        //
-        
-        style: {
-          fillColor: '#ffffff',
-          fillOpacity: 0.5,
-          radius: 8,
-          stroke: false
-        }
-      }).addTo(map);   
+      dataLayer.addData(data);     
     });
 //legend
 var legend = L.control({position: 'bottomright'});
@@ -74,7 +74,7 @@ var musicgeoJSON;
 // use jQuery get geoJSON to grab geoJson layer, parse it, then plot it on the map using the plotDataset function
 
 //$.getJSON( "data/musicfestivals.geojson", function( data ) {
-$.getJSON( "https://clzirkel.cartodb.com/api/v2/sql?q=SELECT * FROM musicfestivals_1", function( data ) {
+$.getJSON( "https://clzirkel.cartodb.com/api/v2/sql?q=SELECT * FROM musicfestivals_1&format=geojson", function( data ) {
     var musicCount = data;
 // draw the dataset on the map
 
